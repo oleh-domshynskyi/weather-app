@@ -1,0 +1,132 @@
+.home {
+    padding: 40px 0;
+}
+
+.searchBtn {
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 0 5px 5px 0;
+    cursor: pointer;
+}
+
+.searchWrap {
+    display: flex;
+    justify-content: center;
+    margin: 0 0 20px;
+}
+
+.search {
+    display: flex;
+    border-radius: 5px;
+    border: 1px solid #000;
+    position: relative;
+    &.invalid {
+        border: 1px solid red;
+
+        & .invalidMsg {
+            display: block;
+        }
+    }
+}
+
+.invalidMsg {
+    color: red;
+    font-size: 10px;
+    line-height: 14px;
+    font-weight: 500;
+    position: absolute;
+    left: 0;
+    bottom: -16px;
+    display: none;
+}
+
+.searchInput {
+    border: none;
+    border-radius: 5px 0 0 5px;
+    padding: 5px 8px;
+    font-size: 20px;
+    line-height: 24px;
+    font-weight: 400;
+}
+
+.city {
+    font-size: 24px;
+    line-height: 28px;
+    font-weight: 600;
+}
+
+.infoWrap {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.temp {
+    font-size: 40px;
+    line-height: 44px;
+    font-weight: 500;
+    margin-right: 15px;
+}
+
+.windSpeed, .humidity {
+    font-size: 20px;
+    line-height: 24px;
+    font-weight: 400;
+    margin-left: 15px;
+}
+
+.weatherCard {
+    padding: 20px;
+    border-radius: 20px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    background-image: url(../../public/images/day.jpeg);
+
+    &.night {
+        background-image: url(../../public/images/night.jpeg);
+
+        & .windSpeed, .humidity, .temp, .city {
+            color: #fff;
+        }
+
+        & .locationIcon {
+            fill: #fff;
+        }
+    }
+}
+
+.windWrap, .humidityWrap {
+    display: flex;
+    align-items: center;
+}
+
+.windWrap {
+    margin-bottom: 10px;
+}
+
+.tempWrap {
+    display: flex;
+    align-items: center;
+}
+
+.weatherImg {
+    width: 70px;
+    height: 70px;
+}
+
+.cityWrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+
+.locationIcon {
+    width: 50px;
+    height: 50px;
+    margin-right: 15px;
+}
