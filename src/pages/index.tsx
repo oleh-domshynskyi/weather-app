@@ -1,10 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
-import Image from 'next/image';
 import styles from '@/styles/Home.module.scss';
-import classNames from 'classnames';
 import debounce from 'lodash.debounce';
-import LocationIcon from '@/public/images/location.svg';
+import WeatherCard from '@/components/weatherCard';
 
 export default function Home() {
   const [weather, setWeather] = useState({
@@ -30,20 +28,7 @@ export default function Home() {
     }
   };
 
-  axios.interceptors.request.use(
-    function (config) {
-      config.params = {
-        ...config.params,
-        appid: `${process.env.NEXT_PUBLIC_API_KEY}`,
-      };
-      return config;
-    },
-    function (error) {
-      return Promise.reject(error);
-    },
-  );
-
-  const onSearchClick = () => {
+  const getData = () => {
     axios
       .get(`https://api.openweathermap.org/data/2.5/weather`, {
         params: {
@@ -52,7 +37,6 @@ export default function Home() {
         },
       })
       .then((res) => {
-        console.log(res);
         if (res.status === 200) {
           setIsValid(true);
           return res.data;
@@ -67,97 +51,46 @@ export default function Home() {
       })
       .catch((error) => {
         console.log(error);
-        setIsValid(false);
+        if (error && !location) {
+          setIsValid(true);
+        } else setIsValid(false);
       });
+  };
+  const search = debounce(getData, 400);
+
+  useEffect(() => {
+    getData();
+  }, []);
+
+  const delayedInputChange = useCallback(debounce(search, 400), [location]);
+
+  const onInputChange = (e: any) => {
+    setLocation(e.target.value);
   };
 
   useEffect(() => {
-    onSearchClick();
-  }, []);
+    delayedInputChange();
+    return delayedInputChange.cancel;
+  }, [location, delayedInputChange]);
 
-  const getImgUrl = () => {
-    if (weatherIcon) {
-      return `http://openweathermap.org/img/w/${weatherIcon}.png`;
-    }
-    return ``;
-  };
-
-  const search = debounce(onSearchClick, 400);
   return (
     <section className={styles.home}>
       <div className="container">
         <div className="row justify-content-center">
           <div className="col-8">
-            <div
-              className={classNames(styles.weatherCard, {
-                [styles.night]: !isDay,
-              })}
-            >
-              <div className={styles.searchWrap}>
-                <div
-                  className={classNames(styles.search, {
-                    [styles.invalid]: !isValid,
-                  })}
-                >
-                  <input
-                    type="text"
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                    placeholder="Enter location"
-                    className={styles.searchInput}
-                  />
-                  <button className={styles.searchBtn} onClick={search}>
-                    <Image
-                      src="/images/search.png"
-                      width={25}
-                      height={25}
-                      alt="search icon"
-                    />
-                  </button>
-                  <h4 className={styles.invalidMsg}>Write correct city</h4>
-                </div>
-              </div>
-              <div className={styles.cityWrap}>
-                <LocationIcon className={styles.locationIcon} />
-                <h1 className={styles.city}>
-                  {weather?.name}, {weather?.sys?.country}
-                </h1>
-              </div>
-              <div className={styles.infoWrap}>
-                <div className={styles.tempWrap}>
-                  <p className={styles.temp}>{weather?.main?.temp}° C</p>
-                  <img
-                    className={styles.weatherImg}
-                    src={getImgUrl()}
-                    alt="weather icon"
-                  />
-                </div>
-                <div>
-                  <div className={styles.windWrap}>
-                    <Image
-                      src="/images/wind.svg"
-                      width={50}
-                      height={60}
-                      alt="wind icon"
-                    />
-                    <p className={styles.windSpeed}>
-                      {weather?.wind?.speed} m/s
-                    </p>
-                  </div>
-                  <div className={styles.humidityWrap}>
-                    <Image
-                      src="/images/humidity.svg"
-                      width={50}
-                      height={60}
-                      alt="humidity icon"
-                    />
-                    <p className={styles.humidity}>
-                      {weather?.main?.humidity} %
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <WeatherCard
+              isDay={isDay}
+              isValid={isValid}
+              onInputChange={onInputChange}
+              location={location}
+              onBtnClick={search}
+              city={weather?.name}
+              country={weather?.sys?.country}
+              weatherIcon={weatherIcon}
+              windSpeed={weather?.wind?.speed}
+              humidity={weather?.main?.humidity}
+              temp={weather?.main?.temp}
+            />
           </div>
         </div>
       </div>
