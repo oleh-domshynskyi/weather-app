@@ -3,7 +3,6 @@ export interface WeatherCardProps {
   isValid: boolean;
   onInputChange: any;
   location: string;
-  onBtnClick: any;
   city: string;
   country: string;
   weatherIcon?: string;

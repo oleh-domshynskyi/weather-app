@@ -10,7 +10,6 @@ const WeatherCard = ({
   isValid,
   onInputChange,
   location,
-  onBtnClick,
   city,
   country,
   weatherIcon,
@@ -43,14 +42,6 @@ const WeatherCard = ({
             placeholder="Enter location"
             className={styles.searchInput}
           />
-          <button className={styles.searchBtn} onClick={onBtnClick}>
-            <Image
-              src="/images/search.png"
-              width={25}
-              height={25}
-              alt="search icon"
-            />
-          </button>
           <h4 className={styles.invalidMsg}>Write correct city</h4>
         </div>
       </div>

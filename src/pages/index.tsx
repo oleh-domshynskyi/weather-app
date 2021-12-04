@@ -3,6 +3,7 @@ import axios from 'axios';
 import styles from '@/styles/Home.module.scss';
 import debounce from 'lodash.debounce';
 import WeatherCard from '@/components/weatherCard';
+import { getDate } from '@/utils';
 
 export default function Home() {
   const [weather, setWeather] = useState({
@@ -15,18 +16,6 @@ export default function Home() {
   const [weatherIcon, setWeatheIcon] = useState();
   const [isValid, setIsValid] = useState(true);
   const [isDay, setIsDay] = useState(Boolean);
-
-  const getDate = (sunrise: number, sunset: number, timezone: number) => {
-    const timezoneDif = timezone * 1000 - 7200000;
-    const date = Date.now() + timezoneDif;
-    const sunriseLocal = sunrise * 1000 + timezoneDif;
-    const sunsetLocal = sunset * 1000 + timezoneDif;
-    if (sunriseLocal > date) {
-      setIsDay(false);
-    } else if (date > sunriseLocal && date < sunsetLocal) {
-      setIsDay(true);
-    }
-  };
 
   const getData = () => {
     axios
@@ -47,7 +36,9 @@ export default function Home() {
       .then((object) => {
         setWeather(object);
         setWeatheIcon(object?.weather[0]?.icon);
-        getDate(object?.sys?.sunrise, object?.sys?.sunset, object?.timezone);
+        setIsDay(
+          getDate(object?.sys?.sunrise, object?.sys?.sunset, object?.timezone),
+        );
       })
       .catch((error) => {
         console.log(error);
@@ -55,14 +46,15 @@ export default function Home() {
           setIsValid(true);
         } else setIsValid(false);
       });
+    return;
   };
-  const search = debounce(getData, 400);
 
   useEffect(() => {
     getData();
+    console.log(getData());
   }, []);
 
-  const delayedInputChange = useCallback(debounce(search, 400), [location]);
+  const delayedInputChange = useCallback(debounce(getData, 500), [location]);
 
   const onInputChange = (e: any) => {
     setLocation(e.target.value);
@@ -83,7 +75,6 @@ export default function Home() {
               isValid={isValid}
               onInputChange={onInputChange}
               location={location}
-              onBtnClick={search}
               city={weather?.name}
               country={weather?.sys?.country}
               weatherIcon={weatherIcon}
